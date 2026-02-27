@@ -1,0 +1,387 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.denna.io/v1/sky/prime-pnl-params.schema.json",
+  "title": "Prime PnL Parameters",
+  "description": "Schema for prime PnL calculation parameter files following the Denna Spec. Defines calculation modules, subsidy config, address classifications, and adjustments.",
+  "type": "object",
+  "required": ["$schema", "metadata", "parameters"],
+  "additionalProperties": false,
+  "properties": {
+    "$schema": {
+      "type": "string"
+    },
+    "metadata": {
+      "$ref": "https://spec.denna.io/schemas/v1/denna-types.schema.json#/$defs/metadata"
+    },
+    "parameters": {
+      "type": "object",
+      "required": ["calculationModules"],
+      "additionalProperties": false,
+      "properties": {
+        "calculationModules": {
+          "type": "array",
+          "description": "PnL calculation modules and their enabled state.",
+          "items": {
+            "$ref": "#/$defs/calculationModule"
+          }
+        },
+        "borrowRateSubsidy": {
+          "$ref": "#/$defs/borrowRateSubsidy"
+        },
+        "assetCaps": {
+          "type": "array",
+          "description": "Per-asset allocation caps.",
+          "items": {
+            "$ref": "#/$defs/assetCap"
+          }
+        },
+        "curvePoolHandling": {
+          "type": "array",
+          "description": "Special handling rules for Curve LP pools.",
+          "items": {
+            "$ref": "#/$defs/curvePoolConfig"
+          }
+        },
+        "oneTimeAdjustments": {
+          "type": "array",
+          "description": "One-time revenue adjustments.",
+          "items": {
+            "$ref": "#/$defs/oneTimeAdjustment"
+          }
+        },
+        "prepayments": {
+          "type": "array",
+          "description": "Prepayment amounts for specific assets.",
+          "items": {
+            "$ref": "#/$defs/prepayment"
+          }
+        },
+        "addressClassifications": {
+          "$ref": "#/$defs/addressClassifications"
+        },
+        "sparkLendConfig": {
+          "$ref": "#/$defs/sparkLendConfig"
+        },
+        "pricingConfig": {
+          "$ref": "#/$defs/pricingConfig"
+        },
+        "psm3TokenComposition": {
+          "$ref": "#/$defs/psm3TokenComposition"
+        },
+        "psm3SkyDirectExposure": {
+          "type": "array",
+          "description": "USDC positions within PSM3 treated as Sky Direct Exposure.",
+          "items": {
+            "$ref": "#/$defs/psm3Exposure"
+          }
+        },
+        "settlementFormula": {
+          "type": "string",
+          "description": "Human-readable settlement formula."
+        },
+        "ethereumSusdsNotes": {
+          "type": "string",
+          "description": "Notes on Ethereum sUSDS treatment."
+        },
+        "knownIssues": {
+          "type": "array",
+          "description": "Documented known issues or bugs.",
+          "items": {
+            "$ref": "#/$defs/knownIssue"
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "calculationModule": {
+      "type": "object",
+      "required": ["id", "name", "enabled"],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Module identifier."
+        },
+        "name": {
+          "type": "string",
+          "description": "Human-readable module name."
+        },
+        "enabled": {
+          "type": "boolean"
+        },
+        "notes": {
+          "type": "string"
+        }
+      }
+    },
+    "borrowRateSubsidy": {
+      "type": "object",
+      "required": ["eligible"],
+      "additionalProperties": false,
+      "properties": {
+        "eligible": {
+          "type": "boolean"
+        },
+        "cap": {
+          "$ref": "https://spec.denna.io/schemas/v1/denna-types.schema.json#/$defs/amount"
+        },
+        "capPeriod": {
+          "type": "string",
+          "description": "Period for the cap (e.g., 'per day')."
+        },
+        "start": {
+          "$ref": "https://spec.denna.io/schemas/v1/denna-types.schema.json#/$defs/date"
+        },
+        "duration": {
+          "$ref": "https://spec.denna.io/schemas/v1/denna-types.schema.json#/$defs/duration"
+        }
+      },
+      "description": "Borrow rate subsidy configuration."
+    },
+    "assetCap": {
+      "type": "object",
+      "required": ["asset", "cap"],
+      "additionalProperties": false,
+      "properties": {
+        "asset": {
+          "type": "string",
+          "description": "Asset symbol."
+        },
+        "cap": {
+          "$ref": "https://spec.denna.io/schemas/v1/denna-types.schema.json#/$defs/amount"
+        },
+        "effect": {
+          "type": "string",
+          "description": "What happens when the cap is exceeded."
+        }
+      }
+    },
+    "curvePoolConfig": {
+      "type": "object",
+      "required": ["lpAddress", "name"],
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "lpAddress": {
+          "$ref": "https://spec.denna.io/schemas/v1/denna-types.schema.json#/$defs/address"
+        },
+        "activeFrom": {
+          "$ref": "https://spec.denna.io/schemas/v1/denna-types.schema.json#/$defs/date"
+        },
+        "treatment": {
+          "type": "string",
+          "description": "How the pool is treated in PnL calculations."
+        }
+      }
+    },
+    "oneTimeAdjustment": {
+      "type": "object",
+      "required": ["month", "address", "amount", "description"],
+      "additionalProperties": false,
+      "properties": {
+        "month": {
+          "type": "string",
+          "pattern": "^\\d{4}-\\d{2}$",
+          "description": "Year-month of the adjustment (YYYY-MM)."
+        },
+        "address": {
+          "$ref": "https://spec.denna.io/schemas/v1/denna-types.schema.json#/$defs/address"
+        },
+        "amount": {
+          "$ref": "https://spec.denna.io/schemas/v1/denna-types.schema.json#/$defs/amount"
+        },
+        "description": {
+          "type": "string"
+        }
+      }
+    },
+    "prepayment": {
+      "type": "object",
+      "required": ["asset", "address", "amount"],
+      "additionalProperties": false,
+      "properties": {
+        "asset": {
+          "type": "string"
+        },
+        "address": {
+          "$ref": "https://spec.denna.io/schemas/v1/denna-types.schema.json#/$defs/address"
+        },
+        "amount": {
+          "$ref": "https://spec.denna.io/schemas/v1/denna-types.schema.json#/$defs/amount"
+        }
+      }
+    },
+    "addressClassifications": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "billAlways": {
+          "type": "array",
+          "description": "Assets always charged at full base rate regardless of APY.",
+          "items": { "$ref": "#/$defs/classifiedAddress" }
+        },
+        "skyTakesAll": {
+          "type": "array",
+          "description": "Sky takes all profit; prime doesn't pay for underperformance.",
+          "items": { "$ref": "#/$defs/classifiedAddress" }
+        },
+        "simplePeriodReturn": {
+          "type": "array",
+          "description": "Period return treated as annual rate (not annualized).",
+          "items": { "$ref": "#/$defs/classifiedAddress" }
+        },
+        "directRate": {
+          "type": "array",
+          "description": "Use liquidity index growth instead of borrow rate conversion.",
+          "items": { "$ref": "#/$defs/classifiedAddress" }
+        },
+        "ssrFunded": {
+          "type": "array",
+          "description": "Assets with idle capital SSR cost deducted from prime revenue.",
+          "items": { "$ref": "#/$defs/classifiedAddress" }
+        },
+        "usdsSsr": {
+          "type": "array",
+          "description": "Use sUSDS price growth as custom base rate.",
+          "items": { "$ref": "#/$defs/classifiedAddress" }
+        }
+      },
+      "description": "Special address classifications that affect PnL treatment."
+    },
+    "classifiedAddress": {
+      "type": "object",
+      "required": ["address", "asset"],
+      "additionalProperties": false,
+      "properties": {
+        "address": {
+          "$ref": "https://spec.denna.io/schemas/v1/denna-types.schema.json#/$defs/address"
+        },
+        "asset": {
+          "type": "string"
+        },
+        "reason": {
+          "type": "string"
+        }
+      }
+    },
+    "sparkLendConfig": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "poolAddress": {
+          "$ref": "https://spec.denna.io/schemas/v1/denna-types.schema.json#/$defs/address",
+          "description": "SparkLend pool contract address."
+        },
+        "underlyingMappings": {
+          "type": "array",
+          "description": "spToken to underlying asset mappings.",
+          "items": {
+            "type": "object",
+            "required": ["spToken", "underlying", "symbol"],
+            "additionalProperties": false,
+            "properties": {
+              "spToken": {
+                "$ref": "https://spec.denna.io/schemas/v1/denna-types.schema.json#/$defs/address"
+              },
+              "underlying": {
+                "$ref": "https://spec.denna.io/schemas/v1/denna-types.schema.json#/$defs/address"
+              },
+              "symbol": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    },
+    "pricingConfig": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "sources": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["asset", "source", "method"],
+            "additionalProperties": false,
+            "properties": {
+              "asset": { "type": "string" },
+              "source": { "type": "string" },
+              "method": { "type": "string" }
+            }
+          }
+        },
+        "centrifugeTokenMappings": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["address", "tokenId", "asset"],
+            "additionalProperties": false,
+            "properties": {
+              "address": {
+                "$ref": "https://spec.denna.io/schemas/v1/denna-types.schema.json#/$defs/address"
+              },
+              "tokenId": { "type": "string" },
+              "asset": { "type": "string" }
+            }
+          }
+        },
+        "prePeriodBuffer": {
+          "$ref": "https://spec.denna.io/schemas/v1/denna-types.schema.json#/$defs/duration"
+        },
+        "postPeriodBuffer": {
+          "$ref": "https://spec.denna.io/schemas/v1/denna-types.schema.json#/$defs/duration"
+        }
+      }
+    },
+    "psm3TokenComposition": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "tokens": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["token", "module", "treatment"],
+            "additionalProperties": false,
+            "properties": {
+              "token": { "type": "string" },
+              "module": { "type": "string" },
+              "treatment": { "type": "string" }
+            }
+          }
+        }
+      }
+    },
+    "psm3Exposure": {
+      "type": "object",
+      "required": ["chain", "usdcAddress"],
+      "additionalProperties": false,
+      "properties": {
+        "chain": {
+          "$ref": "https://spec.denna.io/schemas/v1/denna-types.schema.json#/$defs/chain"
+        },
+        "usdcAddress": {
+          "$ref": "https://spec.denna.io/schemas/v1/denna-types.schema.json#/$defs/address"
+        },
+        "notes": {
+          "type": "string"
+        }
+      }
+    },
+    "knownIssue": {
+      "type": "object",
+      "required": ["id", "description", "status"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string" },
+        "description": { "type": "string" },
+        "source": { "type": "string" },
+        "status": { "type": "string" }
+      }
+    }
+  }
+}

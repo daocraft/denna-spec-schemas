@@ -1,0 +1,199 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.denna.io/v1/sky/shared-params.schema.json",
+  "title": "Shared Parameters",
+  "description": "Schema for shared/global parameter files following the Denna Spec. Covers token addresses, rates, constants, and cross-prime configuration.",
+  "type": "object",
+  "required": ["$schema", "metadata", "parameters"],
+  "additionalProperties": false,
+  "properties": {
+    "$schema": {
+      "type": "string"
+    },
+    "metadata": {
+      "$ref": "https://spec.denna.io/schemas/v1/denna-types.schema.json#/$defs/metadata"
+    },
+    "parameters": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "tokens": {
+          "type": "array",
+          "description": "Token contract addresses grouped by asset.",
+          "items": {
+            "$ref": "#/$defs/tokenGroup"
+          }
+        },
+        "rates": {
+          "type": "object",
+          "description": "Rate parameters and constants.",
+          "additionalProperties": false,
+          "properties": {
+            "ssrSpread": {
+              "$ref": "https://spec.denna.io/schemas/v1/denna-types.schema.json#/$defs/rate"
+            },
+            "ssrSpreadDescription": {
+              "type": "string"
+            },
+            "fallbackRates": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/fallbackRate"
+              }
+            },
+            "rateHierarchy": {
+              "type": "array",
+              "description": "Ordered rate definitions per the methodology.",
+              "items": {
+                "$ref": "#/$defs/rateDefinition"
+              }
+            }
+          }
+        },
+        "borrowRateSubsidy": {
+          "$ref": "#/$defs/subsidyProgram"
+        },
+        "timeConstants": {
+          "type": "object",
+          "description": "Time-related constants used in calculations.",
+          "additionalProperties": {
+            "type": "number"
+          }
+        },
+        "psm3Addresses": {
+          "type": "object",
+          "description": "PSM3-related token addresses grouped by type.",
+          "additionalProperties": false,
+          "properties": {
+            "usds": {
+              "type": "array",
+              "items": { "$ref": "#/$defs/chainAddress" }
+            },
+            "susds": {
+              "type": "array",
+              "items": { "$ref": "#/$defs/chainAddress" }
+            }
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "tokenGroup": {
+      "type": "object",
+      "required": ["symbol", "addresses"],
+      "additionalProperties": false,
+      "properties": {
+        "symbol": {
+          "type": "string",
+          "description": "Token symbol (e.g., USDS, USDC, DAI)."
+        },
+        "description": {
+          "type": "string"
+        },
+        "addresses": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/chainAddress"
+          }
+        }
+      }
+    },
+    "chainAddress": {
+      "type": "object",
+      "required": ["chain", "address"],
+      "additionalProperties": false,
+      "properties": {
+        "chain": {
+          "$ref": "https://spec.denna.io/schemas/v1/denna-types.schema.json#/$defs/chain"
+        },
+        "address": {
+          "$ref": "https://spec.denna.io/schemas/v1/denna-types.schema.json#/$defs/address"
+        },
+        "notes": {
+          "type": "string"
+        }
+      }
+    },
+    "fallbackRate": {
+      "type": "object",
+      "required": ["name", "rate"],
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Rate name (e.g., Fallback SSR, BASE_RATE_PERCENT)."
+        },
+        "rate": {
+          "$ref": "https://spec.denna.io/schemas/v1/denna-types.schema.json#/$defs/rate"
+        },
+        "description": {
+          "type": "string"
+        },
+        "source": {
+          "type": "string"
+        }
+      }
+    },
+    "rateDefinition": {
+      "type": "object",
+      "required": ["name"],
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "formula": {
+          "type": "string",
+          "description": "Human-readable formula for this rate."
+        },
+        "value": {
+          "$ref": "https://spec.denna.io/schemas/v1/denna-types.schema.json#/$defs/rate"
+        },
+        "reference": {
+          "type": "string",
+          "description": "Atlas or methodology reference."
+        },
+        "notes": {
+          "type": "string"
+        }
+      }
+    },
+    "subsidyProgram": {
+      "type": "object",
+      "required": ["start", "duration", "cap", "eligiblePrimes"],
+      "additionalProperties": false,
+      "properties": {
+        "start": {
+          "$ref": "https://spec.denna.io/schemas/v1/denna-types.schema.json#/$defs/date"
+        },
+        "duration": {
+          "$ref": "https://spec.denna.io/schemas/v1/denna-types.schema.json#/$defs/duration"
+        },
+        "cap": {
+          "$ref": "https://spec.denna.io/schemas/v1/denna-types.schema.json#/$defs/amount"
+        },
+        "capPeriod": {
+          "type": "string"
+        },
+        "eligiblePrimes": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "formula": {
+          "type": "string",
+          "description": "Human-readable subsidy formula."
+        },
+        "tBillSource": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "api": { "type": "string" },
+            "field": { "type": "string" },
+            "lookbackDays": { "type": "integer" }
+          }
+        }
+      }
+    }
+  }
+}
