@@ -143,6 +143,14 @@
           "$ref": "https://spec.denna.io/schemas/v1/denna-types.schema.json#/$defs/address",
           "description": "MCD vault proxy address (Ethereum only)."
         },
+        "psm3Address": {
+          "$ref": "https://spec.denna.io/schemas/v1/denna-types.schema.json#/$defs/address",
+          "description": "PSM3 contract address on this chain."
+        },
+        "susdsOracle": {
+          "$ref": "https://spec.denna.io/schemas/v1/denna-types.schema.json#/$defs/address",
+          "description": "sUSDS price oracle address on this chain (L2 chains where sUSDS is a plain ERC20)."
+        },
         "features": {
           "$ref": "#/$defs/chainFeatures"
         }
@@ -164,6 +172,18 @@
         "rwa": {
           "type": "boolean",
           "description": "Real World Asset positions exist on this chain."
+        },
+        "lending": {
+          "type": "boolean",
+          "description": "Lending protocol positions exist on this chain (SparkLend, Aave, Morpho, etc.)."
+        },
+        "idleStablecoins": {
+          "type": "boolean",
+          "description": "Idle stablecoin reimbursement module is active on this chain."
+        },
+        "susds": {
+          "type": "boolean",
+          "description": "sUSDS positions exist on this chain."
         },
         "inPnlChains": {
           "type": "boolean",
