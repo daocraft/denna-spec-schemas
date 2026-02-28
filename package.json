@@ -1,6 +1,6 @@
 {
   "name": "denna-spec-schemas",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Official schema library for the Denna Specification. Reusable JSON Schemas for DeFi, governance, and financial protocol data.",
   "repository": {
     "type": "git",
