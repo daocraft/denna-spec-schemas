@@ -96,6 +96,10 @@
           "$ref": "https://spec.denna.io/schemas/v1/denna-types.schema.json#/$defs/address",
           "description": "Contract address of the allocation position."
         },
+        "vaultAddress": {
+          "$ref": "https://spec.denna.io/schemas/v1/denna-types.schema.json#/$defs/address",
+          "description": "Vault address of the allocation position."
+        },
         "protocol": {
           "type": "string",
           "description": "Protocol or issuer name (e.g., SparkLend, Morpho, Aave, Centrifuge)."
@@ -104,9 +108,22 @@
           "type": "string",
           "description": "Position type.",
           "enum": [
-            "atoken", "erc4626", "erc20", "centrifuge", "centrifuge_feeder",
-            "buidl", "superstate", "curve", "uni_v3_pool", "uni_v3_lp",
-            "anchorage", "ethena", "galaxy_clo", "securitize", "maple", "lp"
+            "atoken",
+            "erc4626",
+            "erc20",
+            "centrifuge",
+            "centrifuge_feeder",
+            "buidl",
+            "superstate",
+            "curve",
+            "uni_v3_pool",
+            "uni_v3_lp",
+            "anchorage",
+            "ethena",
+            "galaxy_clo",
+            "securitize",
+            "maple",
+            "lp"
           ]
         },
         "symbol": {
@@ -127,9 +144,17 @@
           "items": {
             "type": "string",
             "enum": [
-              "idle_lending", "bill_always", "sky_takes_all", "simple_period_return",
-              "direct_rate", "ssr_funded", "ssr_address", "rwa", "psm3",
-              "excluded_spread", "sky_direct_exposure"
+              "idle_lending",
+              "bill_always",
+              "sky_takes_all",
+              "simple_period_return",
+              "direct_rate",
+              "ssr_funded",
+              "ssr_address",
+              "rwa",
+              "psm3",
+              "excluded_spread",
+              "sky_direct_exposure"
             ]
           }
         },
@@ -142,8 +167,12 @@
           "description": "Date from which this position became active."
         },
         "cap": {
-          "type": "number",
-          "description": "USD cap on this position for calculation purposes."
+          "type": "object",
+          "description": "USD cap on this position for calculation purposes.",
+          "properties": {
+            "value": "number",
+            "currency": "string"
+          }
         },
         "notes": {
           "type": "string",
