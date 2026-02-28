@@ -19,14 +19,6 @@
       "description": "Chains the entity operates on, with per-chain addresses and feature flags.",
       "items": { "$ref": "#/$defs/chainEntry" }
     },
-    "allocations": {
-      "type": "object",
-      "description": "Asset allocation positions grouped by chain identifier.",
-      "additionalProperties": {
-        "type": "array",
-        "items": { "$ref": "#/$defs/allocation" }
-      }
-    },
     "debtSource": {
       "type": "object",
       "description": "Where on-chain debt data is sourced from.",
@@ -39,6 +31,14 @@
           "$ref": "https://spec.denna.io/schemas/v1/denna-types.schema.json#/$defs/address"
         },
         "notes": { "type": "string" }
+      }
+    },
+    "allocations": {
+      "type": "object",
+      "description": "Asset allocation positions grouped by chain identifier.",
+      "additionalProperties": {
+        "type": "array",
+        "items": { "$ref": "#/$defs/allocation" }
       }
     }
   },
@@ -62,24 +62,20 @@
         },
         "vaultProxy": {
           "$ref": "https://spec.denna.io/schemas/v1/denna-types.schema.json#/$defs/address",
-          "description": "Vault proxy contract address (e.g., MCD vault)."
+          "description": "Vault proxy contract address (e.g., MCD vault, Ethereum only)."
         },
         "psm3Contract": {
           "$ref": "https://spec.denna.io/schemas/v1/denna-types.schema.json#/$defs/address",
-          "description": "PSM3 contract address on this chain (if applicable)."
+          "description": "PSM3 contract address on this chain."
         },
-        "susdsoracle": {
+        "susdsOracle": {
           "$ref": "https://spec.denna.io/schemas/v1/denna-types.schema.json#/$defs/address",
-          "description": "sUSDS price oracle address on L2 chains."
+          "description": "sUSDS price oracle address on this chain (L2 chains where sUSDS is a plain ERC20)."
         },
         "features": {
           "type": "object",
-          "description": "Feature flags for this chain.",
+          "description": "Feature flags for this chain (e.g., alm, psm3, rwa, lending, idleStablecoins, susds, inPnlChains).",
           "additionalProperties": { "type": "boolean" }
-        },
-        "inPnlChains": {
-          "type": "boolean",
-          "description": "Whether this chain is included in the PnL calculation pipeline."
         },
         "notes": {
           "type": "string",
@@ -98,7 +94,7 @@
         },
         "vaultAddress": {
           "$ref": "https://spec.denna.io/schemas/v1/denna-types.schema.json#/$defs/address",
-          "description": "Vault address of the allocation position."
+          "description": "Associated vault address (e.g., Centrifuge vault)."
         },
         "protocol": {
           "type": "string",
@@ -138,6 +134,11 @@
           "$ref": "https://spec.denna.io/schemas/v1/denna-types.schema.json#/$defs/address",
           "description": "Underlying asset contract address."
         },
+        "markets": {
+          "type": "array",
+          "description": "Market IDs for multi-market vaults (e.g., Morpho).",
+          "items": { "type": "string" }
+        },
         "tags": {
           "type": "array",
           "description": "Classification tags governing how this position is treated in calculations.",
@@ -169,9 +170,10 @@
         "cap": {
           "type": "object",
           "description": "USD cap on this position for calculation purposes.",
+          "additionalProperties": false,
           "properties": {
-            "value": "number",
-            "currency": "string"
+            "value": { "type": "number" },
+            "currency": { "type": "string" }
           }
         },
         "notes": {
@@ -180,7 +182,7 @@
         },
         "extra": {
           "type": "object",
-          "description": "Protocol-specific metadata (vault addresses, market IDs, oracle addresses, etc.).",
+          "description": "Protocol-specific metadata not covered by the standard fields.",
           "additionalProperties": true
         }
       }
