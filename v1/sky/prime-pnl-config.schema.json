@@ -1,8 +1,8 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://schemas.denna.io/v1/sky/prime-pnl-params.schema.json",
+  "$id": "https://schemas.denna.io/v1/sky/prime-pnl-config.schema.json",
   "title": "Prime PnL Parameters",
-  "description": "Schema for prime PnL calculation parameter files following the Denna Spec. Defines calculation modules, subsidy config, address classifications, and adjustments.",
+  "description": "Schema for prime PnL configuration files following the Denna Spec. Covers chains, allocations, calculation modules, subsidy config, address classifications, RWA pricing, and adjustments.",
   "type": "object",
   "required": ["$schema", "metadata", "parameters"],
   "additionalProperties": false,
@@ -18,6 +18,33 @@
       "required": ["calculationModules"],
       "additionalProperties": false,
       "properties": {
+        "chains": {
+          "type": "array",
+          "description": "Active chains for this prime, with proxy addresses and features.",
+          "items": {
+            "$ref": "#/$defs/chainConfig"
+          }
+        },
+        "debtSource": {
+          "$ref": "#/$defs/debtSourceConfig"
+        },
+        "psm3Chains": {
+          "type": "array",
+          "description": "Chain IDs where PSM3 is processed for debt PnL. May include chains not in the prime's own chain list (e.g. shared L2 infrastructure).",
+          "items": {
+            "$ref": "https://spec.denna.io/schemas/v1/denna-types.schema.json#/$defs/chain"
+          }
+        },
+        "allocations": {
+          "type": "object",
+          "description": "Allocation positions keyed by chain ID.",
+          "additionalProperties": {
+            "type": "array",
+            "items": {
+              "$ref": "#/$defs/allocationPosition"
+            }
+          }
+        },
         "calculationModules": {
           "type": "array",
           "description": "PnL calculation modules and their enabled state.",
@@ -94,6 +121,116 @@
     }
   },
   "$defs": {
+    "chainConfig": {
+      "type": "object",
+      "required": ["id", "name"],
+      "additionalProperties": false,
+      "description": "Chain configuration for a prime: proxy addresses and active features.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Chain identifier (e.g., ethereum, base, avalanche)."
+        },
+        "name": {
+          "type": "string",
+          "description": "Human-readable chain name."
+        },
+        "almProxy": {
+          "$ref": "https://spec.denna.io/schemas/v1/denna-types.schema.json#/$defs/address",
+          "description": "ALM proxy contract address on this chain."
+        },
+        "vaultProxy": {
+          "$ref": "https://spec.denna.io/schemas/v1/denna-types.schema.json#/$defs/address",
+          "description": "MCD vault proxy address (Ethereum only)."
+        },
+        "features": {
+          "$ref": "#/$defs/chainFeatures"
+        }
+      }
+    },
+    "chainFeatures": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Feature flags for a chain.",
+      "properties": {
+        "alm": {
+          "type": "boolean",
+          "description": "ALM module is active on this chain."
+        },
+        "psm3": {
+          "type": "boolean",
+          "description": "PSM3 is active on this chain."
+        },
+        "rwa": {
+          "type": "boolean",
+          "description": "Real World Asset positions exist on this chain."
+        },
+        "inPnlChains": {
+          "type": "boolean",
+          "description": "Chain is included in STAR_CHAINS for debt PnL calculations."
+        }
+      }
+    },
+    "debtSourceConfig": {
+      "type": "object",
+      "required": ["chain", "vatAddress"],
+      "additionalProperties": false,
+      "description": "Source of the prime's debt (MCD Vat contract).",
+      "properties": {
+        "chain": {
+          "$ref": "https://spec.denna.io/schemas/v1/denna-types.schema.json#/$defs/chain"
+        },
+        "vatAddress": {
+          "$ref": "https://spec.denna.io/schemas/v1/denna-types.schema.json#/$defs/address"
+        }
+      }
+    },
+    "allocationPosition": {
+      "type": "object",
+      "required": ["contract", "protocol", "type"],
+      "additionalProperties": false,
+      "description": "A single allocation position held by the prime.",
+      "properties": {
+        "contract": {
+          "$ref": "https://spec.denna.io/schemas/v1/denna-types.schema.json#/$defs/address",
+          "description": "Contract address of the position."
+        },
+        "protocol": {
+          "type": "string",
+          "description": "Protocol name (e.g., Centrifuge, Aave, Morpho)."
+        },
+        "type": {
+          "type": "string",
+          "description": "Position type (e.g., centrifuge, atoken, erc4626, erc20, curve, uni_v3_pool)."
+        },
+        "underlying": {
+          "type": "string",
+          "description": "Underlying asset symbol (e.g., USDC, USDS, RLUSD)."
+        },
+        "underlyingAddress": {
+          "$ref": "https://spec.denna.io/schemas/v1/denna-types.schema.json#/$defs/address",
+          "description": "Underlying asset contract address."
+        },
+        "vaultAddress": {
+          "$ref": "https://spec.denna.io/schemas/v1/denna-types.schema.json#/$defs/address",
+          "description": "Associated vault address (e.g., Centrifuge vault)."
+        },
+        "activeFromBlock": {
+          "type": "integer",
+          "description": "Block number from which this position is active."
+        },
+        "markets": {
+          "type": "array",
+          "description": "Morpho market IDs for multi-market vaults.",
+          "items": {
+            "type": "string"
+          }
+        },
+        "notes": {
+          "type": "string"
+        }
+      }
+    },
     "calculationModule": {
       "type": "object",
       "required": ["id", "name", "enabled"],
